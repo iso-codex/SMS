@@ -54,7 +54,7 @@ const AdminLayout = () => {
                         <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center font-bold">
                             <GraduationCap size={20} />
                         </div>
-                        <span className="text-xl font-bold tracking-tight">ia Academy</span>
+                        <span className="text-xl font-bold tracking-tight">SMS</span>
                     </div>
                 </div>
 
