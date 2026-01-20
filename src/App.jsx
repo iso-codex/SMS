@@ -19,6 +19,7 @@ import Exam from './components/admin/Exam';
 import Notice from './components/admin/Notice';
 import Transport from './components/admin/Transport';
 import Hostel from './components/admin/Hostel';
+import Fees from './components/admin/Fees';
 import StudentDashboard from './components/student/Dashboard';
 import SetupPassword from './components/student/SetupPassword';
 
@@ -87,6 +88,7 @@ function App() {
             <Route path="notice" element={<Notice />} />
             <Route path="transport" element={<Transport />} />
             <Route path="hostel" element={<Hostel />} />
+            <Route path="fees" element={<Fees />} />
           </Route>
         </Route>
 

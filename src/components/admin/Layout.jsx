@@ -65,6 +65,7 @@ const AdminLayout = () => {
         { path: '/admin/notice', label: 'Notice', icon: Bell },
         { path: '/admin/transport', label: 'Transport', icon: Bus },
         { path: '/admin/hostel', label: 'Hostel', icon: HomeIcon },
+        { path: '/admin/fees', label: 'Fees', icon: BookOpen }, // Using BookOpen as placeholder, need to import Banknote or similar if available, or re-use existing
     ];
 
     // Filter nav items based on search
@@ -194,8 +195,8 @@ const AdminLayout = () => {
                                     <button
                                         onClick={() => setStudentsExpanded(!studentsExpanded)}
                                         className={`flex items-center justify-between w-full px-4 py-3 rounded-xl transition-all ${isActive
-                                                ? 'bg-purple-600 text-white shadow-lg shadow-purple-900/20'
-                                                : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                                            ? 'bg-purple-600 text-white shadow-lg shadow-purple-900/20'
+                                            : 'text-slate-400 hover:bg-slate-800 hover:text-white'
                                             }`}
                                         title={sidebarCollapsed ? item.label : ''}
                                     >
@@ -213,8 +214,8 @@ const AdminLayout = () => {
                                                     to={subItem.path}
                                                     onClick={() => setMobileMenuOpen(false)}
                                                     className={`block px-4 py-2 rounded-lg text-sm transition-all ${isPathActive(subItem.path)
-                                                            ? 'bg-purple-600/20 text-purple-300 font-medium'
-                                                            : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                                                        ? 'bg-purple-600/20 text-purple-300 font-medium'
+                                                        : 'text-slate-400 hover:bg-slate-800 hover:text-white'
                                                         }`}
                                                 >
                                                     {subItem.label}
@@ -232,8 +233,8 @@ const AdminLayout = () => {
                                 to={item.path}
                                 onClick={() => setMobileMenuOpen(false)}
                                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive
-                                        ? 'bg-purple-600 text-white shadow-lg shadow-purple-900/20'
-                                        : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                                    ? 'bg-purple-600 text-white shadow-lg shadow-purple-900/20'
+                                    : 'text-slate-400 hover:bg-slate-800 hover:text-white'
                                     }`}
                                 title={sidebarCollapsed ? item.label : ''}
                             >

@@ -12,6 +12,7 @@ const AddClassModal = ({ isOpen, onClose, onSuccess, editClass = null }) => {
         section: '',
         room_number: '',
         capacity: '',
+        fee: '',
         teacher_id: ''
     });
     const [errors, setErrors] = useState({});
@@ -26,6 +27,7 @@ const AddClassModal = ({ isOpen, onClose, onSuccess, editClass = null }) => {
                     section: editClass.section || '',
                     room_number: editClass.room_number || '',
                     capacity: editClass.capacity || '',
+                    fee: editClass.fee || '',
                     teacher_id: editClass.teacher_id || ''
                 });
             } else {
@@ -53,6 +55,7 @@ const AddClassModal = ({ isOpen, onClose, onSuccess, editClass = null }) => {
             section: '',
             room_number: '',
             capacity: '',
+            fee: '',
             teacher_id: ''
         });
         setErrors({});
@@ -93,6 +96,7 @@ const AddClassModal = ({ isOpen, onClose, onSuccess, editClass = null }) => {
                 section: formData.section || null,
                 room_number: formData.room_number || null,
                 capacity: formData.capacity ? parseInt(formData.capacity) : null,
+                fee: formData.fee ? parseFloat(formData.fee) : 0,
                 teacher_id: formData.teacher_id || null
             };
 
@@ -214,6 +218,22 @@ const AddClassModal = ({ isOpen, onClose, onSuccess, editClass = null }) => {
                             min="1"
                         />
                         {errors.capacity && <p className="text-red-500 text-sm mt-1">{errors.capacity}</p>}
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">
+                            Annual Fee (₹)
+                        </label>
+                        <input
+                            type="number"
+                            name="fee"
+                            value={formData.fee}
+                            onChange={handleChange}
+                            className={`w-full px-4 py-2.5 border ${errors.fee ? 'border-red-300' : 'border-slate-300'} rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent`}
+                            placeholder="e.g., 5000"
+                            min="0"
+                        />
+                        {errors.fee && <p className="text-red-500 text-sm mt-1">{errors.fee}</p>}
                     </div>
 
                     <div>
