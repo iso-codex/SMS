@@ -222,7 +222,7 @@ const AddClassModal = ({ isOpen, onClose, onSuccess, editClass = null }) => {
 
                     <div>
                         <label className="block text-sm font-semibold text-slate-700 mb-2">
-                            Annual Fee (₹)
+                            Annual Fee (GH₵)
                         </label>
                         <input
                             type="number"

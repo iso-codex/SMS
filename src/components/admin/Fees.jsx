@@ -172,12 +172,12 @@ const Fees = () => {
                                                     <span>{student.classes.name} <span className="text-slate-400 text-sm">({student.classes.grade_level})</span></span>
                                                 ) : <span className="text-slate-400">Not Assigned</span>}
                                             </td>
-                                            <td className="p-6 text-slate-900 font-bold">₹{fee.toLocaleString()}</td>
-                                            <td className="p-6 text-slate-600 font-medium">₹{paid.toLocaleString()}</td>
+                                            <td className="p-6 text-slate-900 font-bold">GH₵ {fee.toLocaleString()}</td>
+                                            <td className="p-6 text-slate-600 font-medium">GH₵ {paid.toLocaleString()}</td>
                                             <td className="p-6">
                                                 <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-bold ${isPaid
-                                                        ? 'bg-green-100 text-green-700'
-                                                        : 'bg-red-100 text-red-700'
+                                                    ? 'bg-green-100 text-green-700'
+                                                    : 'bg-red-100 text-red-700'
                                                     }`}>
                                                     {isPaid ? (
                                                         <>
@@ -187,7 +187,7 @@ const Fees = () => {
                                                     ) : (
                                                         <>
                                                             <AlertCircle size={14} />
-                                                            <span>Owing ₹{balance.toLocaleString()}</span>
+                                                            <span>Owing GH₵ {balance.toLocaleString()}</span>
                                                         </>
                                                     )}
                                                 </div>
@@ -221,10 +221,10 @@ const Fees = () => {
                     <div>
                         <div className="flex justify-between items-center mb-2">
                             <label className="block text-sm font-semibold text-slate-700">
-                                Total Paid Amount (₹)
+                                Total Paid Amount (GH₵)
                             </label>
                             <span className="text-xs font-semibold text-slate-500">
-                                Total Fee: ₹{selectedStudent?.classes?.fee || 0}
+                                Total Fee: GH₵ {selectedStudent?.classes?.fee || 0}
                             </span>
                         </div>
                         <input

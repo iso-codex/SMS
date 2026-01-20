@@ -215,7 +215,7 @@ const Class = () => {
                                 {cls.fee !== undefined && (
                                     <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                                         <span className="text-sm font-bold text-slate-500">Annual Fee</span>
-                                        <span className="text-sm font-medium text-green-600">₹{cls.fee}</span>
+                                        <span className="text-sm font-medium text-green-600">GH₵ {cls.fee}</span>
                                     </div>
                                 )}
                             </div>
