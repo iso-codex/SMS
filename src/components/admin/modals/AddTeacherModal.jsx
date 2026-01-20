@@ -3,55 +3,54 @@ import { Loader2 } from 'lucide-react';
 import Modal from '../../shared/Modal';
 import { supabase } from '../../../lib/supabase';
 
-const AddStudentModal = ({ isOpen, onClose, onSuccess, editStudent = null }) => {
+const AddTeacherModal = ({ isOpen, onClose, onSuccess, editTeacher = null }) => {
     const [loading, setLoading] = useState(false);
-    const [classes, setClasses] = useState([]);
+    const [subjects, setSubjects] = useState([]);
     const [formData, setFormData] = useState({
         full_name: '',
         email: '',
-        roll_number: '',
         phone: '',
         address: '',
         date_of_birth: '',
-        class_id: '',
-        parent_name: '',
-        parent_phone: '',
-        blood_group: '',
-        gender: ''
+        subject_id: '',
+        qualification: '',
+        experience_years: '',
+        joining_date: '',
+        gender: '',
+        teacher_code: ''
     });
     const [errors, setErrors] = useState({});
 
     useEffect(() => {
         if (isOpen) {
-            fetchClasses();
-            if (editStudent) {
+            fetchSubjects();
+            if (editTeacher) {
                 setFormData({
-                    full_name: editStudent.full_name || '',
-                    email: editStudent.email || '',
-                    roll_number: editStudent.roll_number || '',
-                    phone: editStudent.phone || '',
-                    address: editStudent.address || '',
-                    date_of_birth: editStudent.date_of_birth || '',
-                    class_id: editStudent.class_id || '',
-                    parent_name: editStudent.parent_name || '',
-                    parent_phone: editStudent.parent_phone || '',
-                    blood_group: editStudent.blood_group || '',
-                    gender: editStudent.gender || ''
+                    full_name: editTeacher.full_name || '',
+                    email: editTeacher.email || '',
+                    phone: editTeacher.phone || '',
+                    address: editTeacher.address || '',
+                    date_of_birth: editTeacher.date_of_birth || '',
+                    subject_id: editTeacher.subject_id || '',
+                    qualification: editTeacher.qualification || '',
+                    experience_years: editTeacher.experience_years || '',
+                    joining_date: editTeacher.joining_date || '',
+                    gender: editTeacher.gender || ''
                 });
             } else {
                 resetForm();
             }
         }
-    }, [isOpen, editStudent]);
+    }, [isOpen, editTeacher]);
 
-    const fetchClasses = async () => {
+    const fetchSubjects = async () => {
         const { data, error } = await supabase
-            .from('classes')
-            .select('id, name, grade_level')
-            .order('grade_level');
+            .from('subjects')
+            .select('id, name, code')
+            .order('name');
 
         if (!error && data) {
-            setClasses(data);
+            setSubjects(data);
         }
     };
 
@@ -59,31 +58,30 @@ const AddStudentModal = ({ isOpen, onClose, onSuccess, editStudent = null }) => 
         setFormData({
             full_name: '',
             email: '',
-            roll_number: '',
             phone: '',
             address: '',
             date_of_birth: '',
-            class_id: '',
-            parent_name: '',
-            parent_phone: '',
-            blood_group: '',
+            subject_id: '',
+            qualification: '',
+            experience_years: '',
+            joining_date: '',
             gender: '',
-            student_code: generateStudentCode()
+            teacher_code: generateTeacherCode()
         });
         setErrors({});
     };
 
     // Generate random 6-char code
-    function generateStudentCode() {
+    function generateTeacherCode() {
         return Math.random().toString(36).slice(2, 8).toUpperCase();
     }
 
-    // Effect to regenerate code when modal opens for new student
+    // Effect to regenerate code when modal opens for new teacher
     useEffect(() => {
-        if (isOpen && !editStudent) {
-            setFormData(prev => ({ ...prev, student_code: generateStudentCode() }));
+        if (isOpen && !editTeacher) {
+            setFormData(prev => ({ ...prev, teacher_code: generateTeacherCode() }));
         }
-    }, [isOpen, editStudent]);
+    }, [isOpen, editTeacher]);
 
     const validateForm = () => {
         const newErrors = {};
@@ -94,10 +92,12 @@ const AddStudentModal = ({ isOpen, onClose, onSuccess, editStudent = null }) => 
         } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
             newErrors.email = 'Email is invalid';
         }
-        if (!formData.roll_number.trim()) newErrors.roll_number = 'Roll number is required';
-        if (!formData.class_id) newErrors.class_id = 'Class is required';
+        if (!formData.subject_id) newErrors.subject_id = 'Subject is required';
         if (formData.phone && !/^\+?[\d\s-()]+$/.test(formData.phone)) {
             newErrors.phone = 'Phone number is invalid';
+        }
+        if (formData.experience_years && (isNaN(formData.experience_years) || formData.experience_years < 0)) {
+            newErrors.experience_years = 'Experience must be a positive number';
         }
 
         setErrors(newErrors);
@@ -121,68 +121,73 @@ const AddStudentModal = ({ isOpen, onClose, onSuccess, editStudent = null }) => 
         setLoading(true);
 
         try {
-            if (editStudent) {
-                // Update existing student
+            if (editTeacher) {
+                // Update existing teacher
                 const { error } = await supabase
                     .from('users')
                     .update({
                         full_name: formData.full_name,
                         email: formData.email,
-                        roll_number: formData.roll_number,
                         phone: formData.phone,
                         address: formData.address,
                         date_of_birth: formData.date_of_birth || null,
-                        class_id: formData.class_id || null,
-                        parent_name: formData.parent_name,
-                        parent_phone: formData.parent_phone,
-                        blood_group: formData.blood_group,
+                        subject_id: formData.subject_id || null,
+                        qualification: formData.qualification,
+                        experience_years: formData.experience_years ? parseInt(formData.experience_years) : null,
+                        joining_date: formData.joining_date || null,
                         gender: formData.gender
                     })
-                    .eq('id', editStudent.id);
+                    .eq('id', editTeacher.id);
 
                 if (error) throw error;
-                onSuccess('Student updated successfully!');
+
+                // Close modal and reset form first
+                resetForm();
+                onClose();
+
+                // Then show success message
+                onSuccess('Teacher updated successfully!');
             } else {
-                // Create new student using RPC function
+                // Create new teacher using RPC function
                 // First create the auth user with the role
                 const { data: userId, error: createError } = await supabase
                     .rpc('create_user_with_role', {
                         email: formData.email,
-                        password: formData.student_code || 'Student123!', // Use student code as password
+                        password: formData.teacher_code || 'Teacher123!', // Use teacher code as password
                         full_name: formData.full_name,
-                        role: 'student'
+                        role: 'teacher'
                     });
 
                 if (createError) throw createError;
 
-                // Then update with additional student-specific fields
+                // Then update with additional teacher-specific fields
                 const { error: updateError } = await supabase
                     .from('users')
                     .update({
-                        roll_number: formData.roll_number,
                         phone: formData.phone,
                         address: formData.address,
                         date_of_birth: formData.date_of_birth || null,
-                        class_id: formData.class_id || null,
-                        parent_name: formData.parent_name,
-                        parent_phone: formData.parent_phone,
-                        blood_group: formData.blood_group,
+                        subject_id: formData.subject_id || null,
+                        qualification: formData.qualification,
+                        experience_years: formData.experience_years ? parseInt(formData.experience_years) : null,
+                        joining_date: formData.joining_date || new Date().toISOString().split('T')[0],
                         gender: formData.gender,
-                        admission_date: new Date().toISOString().split('T')[0],
-                        student_code: formData.student_code
+                        teacher_code: formData.teacher_code
                     })
                     .eq('id', userId);
 
                 if (updateError) throw updateError;
 
-                onSuccess('Student added successfully!');
-            }
+                // Close modal and reset form first
+                resetForm();
+                onClose();
 
-            onClose();
-            resetForm();
+                // Then show success message
+                onSuccess('Teacher added successfully!');
+            }
         } catch (error) {
-            console.error('Error saving student:', error);
-            setErrors({ submit: error.message || 'Failed to save student. Please try again.' });
+            console.error('Error saving teacher:', error);
+            setErrors({ submit: error.message || 'Failed to save teacher. Please try again.' });
         } finally {
             setLoading(false);
         }
@@ -192,7 +197,7 @@ const AddStudentModal = ({ isOpen, onClose, onSuccess, editStudent = null }) => 
         <Modal
             isOpen={isOpen}
             onClose={onClose}
-            title={editStudent ? 'Edit Student' : 'Add New Student'}
+            title={editTeacher ? 'Edit Teacher' : 'Add New Teacher'}
             size="lg"
         >
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -231,29 +236,14 @@ const AddStudentModal = ({ isOpen, onClose, onSuccess, editStudent = null }) => 
                                 name="email"
                                 value={formData.email}
                                 onChange={handleChange}
-                                disabled={!!editStudent}
-                                className={`w-full px-4 py-2.5 border ${errors.email ? 'border-red-300' : 'border-slate-300'} rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent ${editStudent ? 'bg-slate-100 cursor-not-allowed' : ''}`}
-                                placeholder="student@example.com"
+                                disabled={!!editTeacher}
+                                className={`w-full px-4 py-2.5 border ${errors.email ? 'border-red-300' : 'border-slate-300'} rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent ${editTeacher ? 'bg-slate-100 cursor-not-allowed' : ''}`}
+                                placeholder="teacher@example.com"
                             />
                             {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">
-                                Roll Number <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                name="roll_number"
-                                value={formData.roll_number}
-                                onChange={handleChange}
-                                className={`w-full px-4 py-2.5 border ${errors.roll_number ? 'border-red-300' : 'border-slate-300'} rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent`}
-                                placeholder="e.g., #001"
-                            />
-                            {errors.roll_number && <p className="text-red-500 text-sm mt-1">{errors.roll_number}</p>}
-                        </div>
-
-                        {!editStudent && (
+                        {!editTeacher && (
                             <div>
                                 <label className="block text-sm font-semibold text-slate-700 mb-2">
                                     Access Code (Auto-generated)
@@ -261,34 +251,34 @@ const AddStudentModal = ({ isOpen, onClose, onSuccess, editStudent = null }) => 
                                 <div className="relative">
                                     <input
                                         type="text"
-                                        name="student_code"
-                                        value={formData.student_code}
+                                        name="teacher_code"
+                                        value={formData.teacher_code}
                                         readOnly
                                         className="w-full px-4 py-2.5 border border-purple-200 bg-purple-50 text-purple-700 font-bold rounded-xl focus:outline-none tracking-widest text-center"
                                     />
-                                    <p className="text-xs text-slate-500 mt-1">This code is the student's initial password.</p>
+                                    <p className="text-xs text-slate-500 mt-1">This code is the teacher's initial password.</p>
                                 </div>
                             </div>
                         )}
 
                         <div>
                             <label className="block text-sm font-semibold text-slate-700 mb-2">
-                                Class <span className="text-red-500">*</span>
+                                Subject <span className="text-red-500">*</span>
                             </label>
                             <select
-                                name="class_id"
-                                value={formData.class_id}
+                                name="subject_id"
+                                value={formData.subject_id}
                                 onChange={handleChange}
-                                className={`w-full px-4 py-2.5 border ${errors.class_id ? 'border-red-300' : 'border-slate-300'} rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent`}
+                                className={`w-full px-4 py-2.5 border ${errors.subject_id ? 'border-red-300' : 'border-slate-300'} rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent`}
                             >
-                                <option value="">Select class</option>
-                                {classes.map(cls => (
-                                    <option key={cls.id} value={cls.id}>
-                                        {cls.name} - Grade {cls.grade_level}
+                                <option value="">Select subject</option>
+                                {subjects.map(subject => (
+                                    <option key={subject.id} value={subject.id}>
+                                        {subject.name} ({subject.code})
                                     </option>
                                 ))}
                             </select>
-                            {errors.class_id && <p className="text-red-500 text-sm mt-1">{errors.class_id}</p>}
+                            {errors.subject_id && <p className="text-red-500 text-sm mt-1">{errors.subject_id}</p>}
                         </div>
 
                         <div>
@@ -323,28 +313,6 @@ const AddStudentModal = ({ isOpen, onClose, onSuccess, editStudent = null }) => 
 
                         <div>
                             <label className="block text-sm font-semibold text-slate-700 mb-2">
-                                Blood Group
-                            </label>
-                            <select
-                                name="blood_group"
-                                value={formData.blood_group}
-                                onChange={handleChange}
-                                className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
-                            >
-                                <option value="">Select blood group</option>
-                                <option value="A+">A+</option>
-                                <option value="A-">A-</option>
-                                <option value="B+">B+</option>
-                                <option value="B-">B-</option>
-                                <option value="AB+">AB+</option>
-                                <option value="AB-">AB-</option>
-                                <option value="O+">O+</option>
-                                <option value="O-">O-</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2">
                                 Phone Number
                             </label>
                             <input
@@ -374,35 +342,50 @@ const AddStudentModal = ({ isOpen, onClose, onSuccess, editStudent = null }) => 
                     </div>
                 </div>
 
-                {/* Parent Information */}
+                {/* Professional Information */}
                 <div>
-                    <h3 className="text-lg font-bold text-slate-900 mb-4">Parent/Guardian Information</h3>
+                    <h3 className="text-lg font-bold text-slate-900 mb-4">Professional Information</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-semibold text-slate-700 mb-2">
-                                Parent/Guardian Name
+                                Qualification
                             </label>
                             <input
                                 type="text"
-                                name="parent_name"
-                                value={formData.parent_name}
+                                name="qualification"
+                                value={formData.qualification}
                                 onChange={handleChange}
                                 className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
-                                placeholder="Enter parent name"
+                                placeholder="e.g., M.Sc. in Mathematics"
                             />
                         </div>
 
                         <div>
                             <label className="block text-sm font-semibold text-slate-700 mb-2">
-                                Parent Phone Number
+                                Years of Experience
                             </label>
                             <input
-                                type="tel"
-                                name="parent_phone"
-                                value={formData.parent_phone}
+                                type="number"
+                                name="experience_years"
+                                value={formData.experience_years}
+                                onChange={handleChange}
+                                min="0"
+                                className={`w-full px-4 py-2.5 border ${errors.experience_years ? 'border-red-300' : 'border-slate-300'} rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent`}
+                                placeholder="e.g., 5"
+                            />
+                            {errors.experience_years && <p className="text-red-500 text-sm mt-1">{errors.experience_years}</p>}
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                Joining Date
+                            </label>
+                            <input
+                                type="date"
+                                name="joining_date"
+                                value={formData.joining_date}
                                 onChange={handleChange}
                                 className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
-                                placeholder="+1 234 567 8900"
                             />
                         </div>
                     </div>
@@ -424,7 +407,7 @@ const AddStudentModal = ({ isOpen, onClose, onSuccess, editStudent = null }) => 
                         disabled={loading}
                     >
                         {loading && <Loader2 className="animate-spin" size={20} />}
-                        {loading ? 'Saving...' : (editStudent ? 'Update Student' : 'Add Student')}
+                        {loading ? 'Saving...' : (editTeacher ? 'Update Teacher' : 'Add Teacher')}
                     </button>
                 </div>
             </form>
@@ -432,4 +415,4 @@ const AddStudentModal = ({ isOpen, onClose, onSuccess, editStudent = null }) => 
     );
 };
 
-export default AddStudentModal;
+export default AddTeacherModal;
