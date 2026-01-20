@@ -2,35 +2,110 @@ import React, { useState, useEffect } from 'react';
 import { Search, Plus, Edit2, Trash2, Loader2, GraduationCap, Filter } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
+import AddStudentModal from './modals/AddStudentModal';
+import ConfirmDialog from '../shared/ConfirmDialog';
+import Toast, { useToast } from '../shared/Toast';
 
 const Students = () => {
     const [students, setStudents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterClass, setFilterClass] = useState('all');
+    const [classes, setClasses] = useState([]);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [editingStudent, setEditingStudent] = useState(null);
+    const [deletingStudent, setDeletingStudent] = useState(null);
+    const { toast, showToast, hideToast } = useToast();
 
     useEffect(() => {
         fetchStudents();
+        fetchClasses();
     }, []);
 
     const fetchStudents = async () => {
         setLoading(true);
-        // Placeholder - replace with actual Supabase query
-        setTimeout(() => {
-            setStudents([
-                { id: 1, name: 'Eleanor Pena', roll: '#01', address: 'TA-107 Newyork', class: '01', dob: '02/05/2001', phone: '+123 6988567' },
-                { id: 2, name: 'Jessia Rose', roll: '#10', address: 'TA-107 Newyork', class: '02', dob: '03/04/2000', phone: '+123 8988569' },
-                { id: 3, name: 'Jenny Wilson', roll: '#04', address: 'Australia, Sydney', class: '01', dob: '12/05/2001', phone: '+123 7988566' },
-                { id: 4, name: 'Guy Hawkins', roll: '#03', address: 'Australia, Sydney', class: '02', dob: '03/05/2001', phone: '+123 5988565' },
-            ]);
+        try {
+            const { data, error } = await supabase
+                .from('users')
+                .select(`
+                    *,
+                    classes:class_id (
+                        id,
+                        name,
+                        grade_level
+                    )
+                `)
+                .eq('role', 'student')
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+            setStudents(data || []);
+        } catch (error) {
+            console.error('Error fetching students:', error);
+            showToast('Failed to load students', 'error');
+        } finally {
             setLoading(false);
-        }, 500);
+        }
+    };
+
+    const fetchClasses = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('classes')
+                .select('id, name, grade_level')
+                .order('grade_level');
+
+            if (error) throw error;
+            setClasses(data || []);
+        } catch (error) {
+            console.error('Error fetching classes:', error);
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!deletingStudent) return;
+
+        try {
+            const { error } = await supabase
+                .from('users')
+                .delete()
+                .eq('id', deletingStudent.id);
+
+            if (error) throw error;
+
+            showToast('Student deleted successfully', 'success');
+            fetchStudents();
+        } catch (error) {
+            console.error('Error deleting student:', error);
+            showToast('Failed to delete student', 'error');
+        } finally {
+            setDeletingStudent(null);
+        }
+    };
+
+    const handleEdit = (student) => {
+        setEditingStudent(student);
+        setIsAddModalOpen(true);
+    };
+
+    const handleModalClose = () => {
+        setIsAddModalOpen(false);
+        setEditingStudent(null);
+    };
+
+    const handleSuccess = (message) => {
+        showToast(message, 'success');
+        fetchStudents();
     };
 
     const filteredStudents = students.filter(student => {
-        const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            student.roll.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesClass = filterClass === 'all' || student.class === filterClass;
+        const matchesSearch =
+            student.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            student.roll_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            student.email?.toLowerCase().includes(searchTerm.toLowerCase());
+
+        const matchesClass = filterClass === 'all' || student.class_id === filterClass;
+
         return matchesSearch && matchesClass;
     });
 
@@ -41,9 +116,12 @@ const Students = () => {
                     <h1 className="text-3xl font-black text-slate-900 tracking-tight">Students List</h1>
                     <p className="text-slate-500 font-medium mt-2">Manage all student records and information.</p>
                 </div>
-                <button className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-5 py-3 rounded-xl font-bold transition-all shadow-lg shadow-purple-600/20 active:scale-[0.98]">
+                <button
+                    onClick={() => setIsAddModalOpen(true)}
+                    className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-5 py-3 rounded-xl font-bold transition-all shadow-lg shadow-purple-600/20 active:scale-[0.98]"
+                >
                     <Plus size={20} />
-                    <span>Add Students</span>
+                    <span>Add Student</span>
                 </button>
             </div>
 
@@ -53,7 +131,7 @@ const Students = () => {
                     <Search className="text-slate-400" size={20} />
                     <input
                         type="text"
-                        placeholder="Search by name or roll..."
+                        placeholder="Search by name, roll number, or email..."
                         className="flex-1 bg-transparent border-none focus:outline-none text-slate-700 font-medium placeholder:text-slate-400"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -67,10 +145,11 @@ const Students = () => {
                         onChange={(e) => setFilterClass(e.target.value)}
                     >
                         <option value="all">All Classes</option>
-                        <option value="01">Class 01</option>
-                        <option value="02">Class 02</option>
-                        <option value="03">Class 03</option>
-                        <option value="04">Class 04</option>
+                        {classes.map(cls => (
+                            <option key={cls.id} value={cls.id}>
+                                {cls.name} - Grade {cls.grade_level}
+                            </option>
+                        ))}
                     </select>
                 </div>
             </div>
@@ -83,9 +162,8 @@ const Students = () => {
                             <tr className="bg-slate-50 border-b border-slate-100">
                                 <th className="p-6 font-bold text-slate-500 text-sm uppercase tracking-wider">Student's Name</th>
                                 <th className="p-6 font-bold text-slate-500 text-sm uppercase tracking-wider">Roll</th>
-                                <th className="p-6 font-bold text-slate-500 text-sm uppercase tracking-wider">Address</th>
+                                <th className="p-6 font-bold text-slate-500 text-sm uppercase tracking-wider">Email</th>
                                 <th className="p-6 font-bold text-slate-500 text-sm uppercase tracking-wider">Class</th>
-                                <th className="p-6 font-bold text-slate-500 text-sm uppercase tracking-wider">Date of Birth</th>
                                 <th className="p-6 font-bold text-slate-500 text-sm uppercase tracking-wider">Phone</th>
                                 <th className="p-6 font-bold text-slate-500 text-sm uppercase tracking-wider text-right">Action</th>
                             </tr>
@@ -93,50 +171,93 @@ const Students = () => {
                         <tbody className="divide-y divide-slate-50">
                             {loading ? (
                                 <tr>
-                                    <td colSpan="7" className="p-10 text-center text-slate-500">
+                                    <td colSpan="6" className="p-10 text-center text-slate-500">
                                         <Loader2 className="animate-spin mx-auto mb-2" />
                                         Loading students...
                                     </td>
                                 </tr>
                             ) : filteredStudents.length === 0 ? (
                                 <tr>
-                                    <td colSpan="7" className="p-10 text-center text-slate-500 font-medium">
-                                        No students found matching your criteria.
+                                    <td colSpan="6" className="p-10 text-center text-slate-500 font-medium">
+                                        {searchTerm || filterClass !== 'all'
+                                            ? 'No students found matching your criteria.'
+                                            : 'No students yet. Click "Add Student" to get started.'}
                                     </td>
                                 </tr>
                             ) : (
                                 filteredStudents.map((student) => (
-                                    <tr key={student.id} className="hover:bg-slate-50/50 transition-colors">
+                                    <motion.tr
+                                        key={student.id}
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        className="hover:bg-slate-50/50 transition-colors"
+                                    >
                                         <td className="p-6">
                                             <div className="flex items-center gap-4">
                                                 <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold border border-purple-200">
-                                                    {student.name[0]}
+                                                    {student.full_name?.[0]?.toUpperCase() || 'S'}
                                                 </div>
-                                                <div className="font-bold text-slate-900">{student.name}</div>
+                                                <div className="font-bold text-slate-900">{student.full_name || 'N/A'}</div>
                                             </div>
                                         </td>
-                                        <td className="p-6 text-slate-600 font-medium">{student.roll}</td>
-                                        <td className="p-6 text-slate-600 font-medium">{student.address}</td>
-                                        <td className="p-6 text-slate-600 font-medium">{student.class}</td>
-                                        <td className="p-6 text-slate-600 font-medium">{student.dob}</td>
-                                        <td className="p-6 text-slate-600 font-medium">{student.phone}</td>
+                                        <td className="p-6 text-slate-600 font-medium">{student.roll_number || 'N/A'}</td>
+                                        <td className="p-6 text-slate-600 font-medium">{student.email}</td>
+                                        <td className="p-6 text-slate-600 font-medium">
+                                            {student.classes?.name || 'Not Assigned'}
+                                        </td>
+                                        <td className="p-6 text-slate-600 font-medium">{student.phone || 'N/A'}</td>
                                         <td className="p-6 text-right">
                                             <div className="flex items-center justify-end gap-2">
-                                                <button className="p-2 text-slate-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors">
+                                                <button
+                                                    onClick={() => handleEdit(student)}
+                                                    className="p-2 text-slate-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                                                    title="Edit student"
+                                                >
                                                     <Edit2 size={18} />
                                                 </button>
-                                                <button className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                                                <button
+                                                    onClick={() => setDeletingStudent(student)}
+                                                    className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                    title="Delete student"
+                                                >
                                                     <Trash2 size={18} />
                                                 </button>
                                             </div>
                                         </td>
-                                    </tr>
+                                    </motion.tr>
                                 ))
                             )}
                         </tbody>
                     </table>
                 </div>
             </div>
+
+            {/* Add/Edit Student Modal */}
+            <AddStudentModal
+                isOpen={isAddModalOpen}
+                onClose={handleModalClose}
+                onSuccess={handleSuccess}
+                editStudent={editingStudent}
+            />
+
+            {/* Delete Confirmation Dialog */}
+            <ConfirmDialog
+                isOpen={!!deletingStudent}
+                onClose={() => setDeletingStudent(null)}
+                onConfirm={handleDelete}
+                title="Delete Student"
+                message={`Are you sure you want to delete ${deletingStudent?.full_name}? This action cannot be undone.`}
+                confirmText="Delete"
+                type="danger"
+            />
+
+            {/* Toast Notification */}
+            <Toast
+                message={toast.message}
+                type={toast.type}
+                isVisible={toast.isVisible}
+                onClose={hideToast}
+            />
         </div>
     );
 };
