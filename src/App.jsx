@@ -19,8 +19,50 @@ import Exam from './components/admin/Exam';
 import Notice from './components/admin/Notice';
 import Transport from './components/admin/Transport';
 import Hostel from './components/admin/Hostel';
+import StudentDashboard from './components/student/Dashboard';
+import SetupPassword from './components/student/SetupPassword';
+
+import { useEffect } from 'react';
+import { supabase } from './lib/supabase';
+import useAuthStore from './lib/authStore';
 
 function App() {
+  const { setSession, setProfile } = useAuthStore();
+
+  useEffect(() => {
+    // Check initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session) fetchProfile(session.user.id);
+    });
+
+    // Listen for auth changes (including Magic Link verification)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (session) {
+        fetchProfile(session.user.id);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const fetchProfile = async (userId) => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (!error && data) {
+        setProfile(data);
+      }
+    } catch (err) {
+      console.error('Error fetching profile:', err);
+    }
+  };
+
   return (
     <BrowserRouter>
       <Routes>
@@ -46,6 +88,12 @@ function App() {
             <Route path="transport" element={<Transport />} />
             <Route path="hostel" element={<Hostel />} />
           </Route>
+        </Route>
+
+        {/* Student Routes */}
+        <Route element={<ProtectedRoute allowedRoles={['student']} />}>
+          <Route path="/student/dashboard" element={<StudentDashboard />} />
+          <Route path="/student/setup-password" element={<SetupPassword />} />
         </Route>
       </Routes>
     </BrowserRouter>

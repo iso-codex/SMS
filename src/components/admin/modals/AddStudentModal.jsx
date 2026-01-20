@@ -67,10 +67,23 @@ const AddStudentModal = ({ isOpen, onClose, onSuccess, editStudent = null }) => 
             parent_name: '',
             parent_phone: '',
             blood_group: '',
-            gender: ''
+            gender: '',
+            student_code: generateStudentCode()
         });
         setErrors({});
     };
+
+    // Generate random 6-char code
+    function generateStudentCode() {
+        return Math.random().toString(36).slice(2, 8).toUpperCase();
+    }
+
+    // Effect to regenerate code when modal opens for new student
+    useEffect(() => {
+        if (isOpen && !editStudent) {
+            setFormData(prev => ({ ...prev, student_code: generateStudentCode() }));
+        }
+    }, [isOpen, editStudent]);
 
     const validateForm = () => {
         const newErrors = {};
@@ -145,7 +158,8 @@ const AddStudentModal = ({ isOpen, onClose, onSuccess, editStudent = null }) => 
                         parent_phone: formData.parent_phone,
                         blood_group: formData.blood_group,
                         gender: formData.gender,
-                        admission_date: new Date().toISOString().split('T')[0]
+                        admission_date: new Date().toISOString().split('T')[0],
+                        student_code: formData.student_code // Pass to backend
                     }
                 });
 
@@ -236,6 +250,24 @@ const AddStudentModal = ({ isOpen, onClose, onSuccess, editStudent = null }) => 
                             />
                             {errors.roll_number && <p className="text-red-500 text-sm mt-1">{errors.roll_number}</p>}
                         </div>
+
+                        {!editStudent && (
+                            <div>
+                                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                    Access Code (Auto-generated)
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        name="student_code"
+                                        value={formData.student_code}
+                                        readOnly
+                                        className="w-full px-4 py-2.5 border border-purple-200 bg-purple-50 text-purple-700 font-bold rounded-xl focus:outline-none tracking-widest text-center"
+                                    />
+                                    <p className="text-xs text-slate-500 mt-1">This code is the student's initial password.</p>
+                                </div>
+                            </div>
+                        )}
 
                         <div>
                             <label className="block text-sm font-semibold text-slate-700 mb-2">
