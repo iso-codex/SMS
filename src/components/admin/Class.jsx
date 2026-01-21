@@ -207,9 +207,24 @@ const Class = () => {
                                     </div>
                                 )}
                                 {cls.capacity && (
-                                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                                        <span className="text-sm font-bold text-slate-500">Capacity</span>
-                                        <span className="text-sm font-medium text-slate-900">{cls.capacity}</span>
+                                    <div className="p-3 bg-slate-50 rounded-lg">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-sm font-bold text-slate-500">Occupancy</span>
+                                            <span className="text-xs font-bold text-slate-400">
+                                                {Math.round(((cls.student_count || 0) / cls.capacity) * 100)}% Full
+                                            </span>
+                                        </div>
+                                        <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
+                                            <div
+                                                className={`h-full rounded-full transition-all duration-500 ${((cls.student_count || 0) / cls.capacity) * 100 < 30 ? 'bg-red-500' :
+                                                        ((cls.student_count || 0) / cls.capacity) * 100 < 70 ? 'bg-yellow-500' : 'bg-green-500'
+                                                    }`}
+                                                style={{ width: `${Math.min(((cls.student_count || 0) / cls.capacity) * 100, 100)}%` }}
+                                            />
+                                        </div>
+                                        <div className="flex justify-end mt-1">
+                                            <span className="text-[10px] font-medium text-slate-400">{cls.capacity} Capacity</span>
+                                        </div>
                                     </div>
                                 )}
                                 {cls.fee !== undefined && (
