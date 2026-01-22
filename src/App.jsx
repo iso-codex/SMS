@@ -22,6 +22,11 @@ import Hostel from './components/admin/Hostel';
 import Fees from './components/admin/Fees';
 import StudentDashboard from './components/student/Dashboard';
 import SetupPassword from './components/student/SetupPassword';
+import StudentLayout from './components/student/Layout';
+import StudentRoutine from './components/student/Routine';
+import StudentExam from './components/student/Exam';
+import StudentHostel from './components/student/Hostel';
+import StudentSettings from './components/student/Settings';
 
 import { useEffect } from 'react';
 import { supabase } from './lib/supabase';
@@ -94,8 +99,14 @@ function App() {
 
         {/* Student Routes */}
         <Route element={<ProtectedRoute allowedRoles={['student']} />}>
-          <Route path="/student/dashboard" element={<StudentDashboard />} />
-          <Route path="/student/setup-password" element={<SetupPassword />} />
+          <Route path="/student" element={<StudentLayout />}>
+            <Route path="dashboard" element={<StudentDashboard />} />
+            <Route path="setup-password" element={<SetupPassword />} />
+            <Route path="routine" element={<StudentRoutine />} />
+            <Route path="exam" element={<StudentExam />} />
+            <Route path="hostel" element={<StudentHostel />} />
+            <Route path="settings" element={<StudentSettings />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>

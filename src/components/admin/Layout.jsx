@@ -24,7 +24,7 @@ const AdminLayout = () => {
         const fetchUserProfile = async () => {
             if (user?.id) {
                 const { data, error } = await supabase
-                    .from('profiles')
+                    .from('users')
                     .select('*')
                     .eq('id', user.id)
                     .single();

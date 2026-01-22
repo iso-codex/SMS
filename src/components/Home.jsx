@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Navbar from './Navbar';
 import Hero from './Hero';
 import Programs from './Programs';
@@ -49,9 +50,9 @@ const CTASection = () => (
                         Join thousands of students who are already achieving their academic dreams with our platform.
                     </p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <button className="btn bg-white text-blue-900 hover:scale-105 px-10 py-4 text-lg">
+                        <Link to="/login" className="btn bg-white text-blue-900 hover:scale-105 px-10 py-4 text-lg">
                             Get Started for Free
-                        </button>
+                        </Link>
                         <button className="btn border border-blue-400 text-white hover:bg-blue-400/10 px-10 py-4 text-lg">
                             View All Programs
                         </button>

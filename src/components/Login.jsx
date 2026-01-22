@@ -99,9 +99,9 @@ const Login = () => {
             const { data: users, error: dbError } = await supabase
                 .from('users')
                 .select('*')
+                .eq('role', 'student')
                 .ilike('email', email)
-                .ilike('full_name', fullName)
-                .eq('role', 'student');
+                .ilike('full_name', fullName);
 
             if (dbError) throw dbError;
 
