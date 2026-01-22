@@ -99,20 +99,20 @@ const Login = () => {
             const { data: users, error: dbError } = await supabase
                 .from('users')
                 .select('*')
-                .eq('role', 'student')
+                .in('role', ['student', 'teacher'])
                 .ilike('email', email)
                 .ilike('full_name', fullName);
 
             if (dbError) throw dbError;
 
             if (!users || users.length === 0) {
-                throw new Error("Student not found. Please check your Name and Email.");
+                throw new Error("User not found. Please check your Name and Email.");
             }
 
-            const student = users[0];
+            const user = users[0];
 
             // 2. Check if password is changed
-            if (student.is_password_changed) {
+            if (user.is_password_changed) {
                 setStudentStep('password');
             } else {
                 // First time login - Enter Access Code
@@ -171,6 +171,7 @@ const Login = () => {
         // Redirect Logic
         if (profileData.role === 'admin') navigate('/admin/dashboard');
         else if (profileData.role === 'teacher') navigate('/teacher/dashboard');
+        else if (profileData.role === 'accountant') navigate('/accountant/dashboard');
         else if (profileData.role === 'student') {
             // Check if password changed flag is false
             if (!profileData.is_password_changed) {
@@ -191,7 +192,7 @@ const Login = () => {
             <div className="bg-white rounded-[2rem] shadow-[0_20px_50px_rgba(8,_112,_184,_0.14)] overflow-hidden w-full max-w-[1100px] grid grid-cols-1 md:grid-cols-2 min-h-[650px]">
 
                 {/* Left Side - Brand/Toggle */}
-                <div className={`relative overflow-hidden ${loginMode === 'student' ? 'bg-purple-600' : 'bg-blue-600'} text-white p-12 flex flex-col justify-between transition-colors duration-500`}>
+                <div className={`relative overflow-hidden ${loginMode === 'verification' ? 'bg-purple-600' : 'bg-blue-600'} text-white p-12 flex flex-col justify-between transition-colors duration-500`}>
                     {/* Abstract Shapes */}
                     <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl -mr-40 -mt-20 mix-blend-overlay" />
                     <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/30 rounded-full blur-3xl -ml-20 -mb-20" />
@@ -217,12 +218,12 @@ const Login = () => {
                                 className="max-w-md"
                             >
                                 <h1 className="text-4xl lg:text-5xl font-black mb-6 leading-[1.1] tracking-tight">
-                                    {loginMode === 'student' ? "Student Portal" : "Welcome Admin"}
+                                    {loginMode === 'verification' ? "Student & Teacher Portal" : "Admin Staff Portal"}
                                 </h1>
                                 <p className="text-blue-100 text-lg mb-10 leading-relaxed font-medium">
-                                    {loginMode === 'student'
-                                        ? "Access your dashboard, check results, and manage your schedule."
-                                        : "Manage the entire school system efficiently and securely."}
+                                    {loginMode === 'verification'
+                                        ? "Verify your identity using your assigned code to access your dashboard."
+                                        : "Secure login for administrators, accountants, and staff members."}
                                 </p>
                             </motion.div>
                         </AnimatePresence>
@@ -237,10 +238,10 @@ const Login = () => {
                             Admin / Staff
                         </button>
                         <button
-                            onClick={() => handleSwitchMode('student')}
-                            className={`flex-1 py-3 rounded-lg font-bold text-sm transition-all ${loginMode === 'student' ? 'bg-white text-purple-600 shadow-md' : 'text-white/70 hover:text-white'}`}
+                            onClick={() => handleSwitchMode('verification')}
+                            className={`flex-1 py-3 rounded-lg font-bold text-sm transition-all ${loginMode === 'verification' ? 'bg-white text-purple-600 shadow-md' : 'text-white/70 hover:text-white'}`}
                         >
-                            Student
+                            Student / Teacher
                         </button>
                     </div>
                 </div>
@@ -265,8 +266,8 @@ const Login = () => {
                             </div>
                         )}
 
-                        {/* STUDENT FORM */}
-                        {loginMode === 'student' && (
+                        {/* STUDENT/TEACHER FORM */}
+                        {loginMode === 'verification' && (
                             <form className="space-y-5" onSubmit={
                                 studentStep === 'identify' ? handleStudentIdentityCheck :
                                     studentStep === 'otp' ? (e) => {

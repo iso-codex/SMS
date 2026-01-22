@@ -65,7 +65,8 @@ const AdminLayout = () => {
         { path: '/admin/notice', label: 'Notice', icon: Bell },
         { path: '/admin/transport', label: 'Transport', icon: Bus },
         { path: '/admin/hostel', label: 'Hostel', icon: HomeIcon },
-        { path: '/admin/fees', label: 'Fees', icon: BookOpen }, // Using BookOpen as placeholder, need to import Banknote or similar if available, or re-use existing
+        { path: '/admin/fees', label: 'Fees', icon: BookOpen },
+        { path: '/admin/accountants', label: 'Accountants', icon: Users },
     ];
 
     // Filter nav items based on search

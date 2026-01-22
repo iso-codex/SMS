@@ -9,6 +9,7 @@ import UserManagement from './components/admin/UserManagement';
 import Students from './components/admin/Students';
 import StudentDetails from './components/admin/StudentDetails';
 import Teachers from './components/admin/Teachers';
+import Accountants from './components/admin/Accountants';
 import Library from './components/admin/Library';
 import Account from './components/admin/Account';
 import Class from './components/admin/Class';
@@ -27,6 +28,13 @@ import StudentRoutine from './components/student/Routine';
 import StudentExam from './components/student/Exam';
 import StudentHostel from './components/student/Hostel';
 import StudentSettings from './components/student/Settings';
+import TeacherLayout from './components/teacher/Layout';
+import TeacherDashboard from './components/teacher/Dashboard';
+import TeacherClasses from './components/teacher/Classes';
+import TeacherExams from './components/teacher/Exams';
+import TeacherSettings from './components/teacher/Settings';
+import AccountantLayout from './components/accountant/Layout';
+import AccountantDashboard from './components/accountant/Dashboard';
 
 import { useEffect } from 'react';
 import { supabase } from './lib/supabase';
@@ -94,6 +102,7 @@ function App() {
             <Route path="transport" element={<Transport />} />
             <Route path="hostel" element={<Hostel />} />
             <Route path="fees" element={<Fees />} />
+            <Route path="accountants" element={<Accountants />} />
           </Route>
         </Route>
 
@@ -106,6 +115,27 @@ function App() {
             <Route path="exam" element={<StudentExam />} />
             <Route path="hostel" element={<StudentHostel />} />
             <Route path="settings" element={<StudentSettings />} />
+          </Route>
+        </Route>
+
+        {/* Teacher Routes */}
+        <Route element={<ProtectedRoute allowedRoles={['teacher']} />}>
+          <Route path="/teacher" element={<TeacherLayout />}>
+            <Route path="dashboard" element={<TeacherDashboard />} />
+            <Route path="classes" element={<TeacherClasses />} />
+            <Route path="exams" element={<TeacherExams />} />
+            <Route path="settings" element={<TeacherSettings />} />
+          </Route>
+        </Route>
+
+        {/* Accountant Routes */}
+        <Route element={<ProtectedRoute allowedRoles={['accountant']} />}>
+          <Route path="/accountant" element={<AccountantLayout />}>
+            <Route path="dashboard" element={<AccountantDashboard />} />
+            {/* Additional routes will be added here */}
+            <Route path="fees" element={<div>Fees Page</div>} />
+            <Route path="students" element={<div>Students Page</div>} />
+            <Route path="settings" element={<div>Settings Page</div>} />
           </Route>
         </Route>
       </Routes>

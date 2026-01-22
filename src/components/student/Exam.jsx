@@ -13,6 +13,11 @@ const StudentExam = () => {
         { id: 2, title: 'Science General Knowledge', availableUntil: '2024-05-12', duration: '30 mins', status: 'Enrolled' },
     ];
 
+    const assignedExams = [
+        { id: 1, title: 'Math Midterm', subject: 'Mathematics', date: '2025-10-15', file: 'math_midterm.pdf', teacher: 'Mr. Anderson' },
+        { id: 2, title: 'Physics Quiz', subject: 'Physics', date: '2025-10-20', file: 'physics_quiz.pdf', teacher: 'Ms. Davids' },
+    ];
+
     return (
         <div className="p-8 max-w-7xl mx-auto space-y-8">
             <div className="mb-8">
@@ -90,15 +95,27 @@ const StudentExam = () => {
                     </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-3xl p-8 text-white">
-                    <h2 className="text-2xl font-black mb-4">Exam Materials</h2>
-                    <p className="text-indigo-100 font-medium mb-8">
-                        Access past papers, model answers, and study guides for your upcoming examinations.
-                    </p>
-                    <button className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-white text-indigo-600 font-bold hover:bg-indigo-50 transition-colors">
-                        <Download size={20} />
-                        Visit Download Center
-                    </button>
+                <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 flex flex-col">
+                    <h2 className="text-xl font-bold text-slate-800 mb-6">Assigned Exam Papers</h2>
+                    <div className="space-y-4 flex-1 overflow-y-auto max-h-[400px]">
+                        {assignedExams.map((exam) => (
+                            <div key={exam.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-100 group hover:border-blue-200 transition-colors">
+                                <div className="flex justify-between items-start mb-2">
+                                    <h4 className="font-bold text-slate-800">{exam.title}</h4>
+                                    <span className="text-xs font-bold text-slate-400 bg-white px-2 py-1 rounded-md border border-slate-100">
+                                        {exam.subject}
+                                    </span>
+                                </div>
+                                <p className="text-xs text-slate-500 font-medium mb-3">
+                                    Assigned by <span className="text-slate-700">{exam.teacher}</span> • Due {exam.date}
+                                </p>
+                                <button className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-white border border-slate-200 text-blue-600 font-bold text-sm hover:bg-blue-50 hover:border-blue-200 transition-all shadow-sm">
+                                    <Download size={16} />
+                                    Download {exam.file}
+                                </button>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>

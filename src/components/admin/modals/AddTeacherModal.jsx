@@ -31,7 +31,7 @@ const AddTeacherModal = ({ isOpen, onClose, onSuccess, editTeacher = null }) => 
                     phone: editTeacher.phone || '',
                     address: editTeacher.address || '',
                     date_of_birth: editTeacher.date_of_birth || '',
-                    subject_id: editTeacher.subject_id || '',
+                    subject_id: editTeacher.subject_id || editTeacher.subjects?.id || '',
                     qualification: editTeacher.qualification || '',
                     experience_years: editTeacher.experience_years || '',
                     joining_date: editTeacher.joining_date || '',
