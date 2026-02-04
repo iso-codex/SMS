@@ -20,7 +20,7 @@ const Navbar = () => {
     { name: 'Home', href: '/' },
     {
       name: 'Programs',
-      href: '#',
+      href: '/programs',
       dropdown: [
         { name: 'Cambridge Checkpoint', icon: GraduationCap, sub: 'Primary & Lower Secondary' },
         { name: 'IGCSE Preparation', icon: BookOpen, sub: 'Year 10 & 11 Intensive' },
@@ -51,13 +51,13 @@ const Navbar = () => {
               onMouseEnter={() => setActiveDropdown(link.name)}
               onMouseLeave={() => setActiveDropdown(null)}
             >
-              <a
-                href={link.href}
+              <Link
+                to={link.href}
                 className="flex items-center gap-1.5 font-bold text-sm text-slate-600 hover:text-blue-600 transition-colors uppercase tracking-widest"
               >
                 {link.name}
                 {link.dropdown && <ChevronDown size={14} className={`transition-transform duration-300 ${activeDropdown === link.name ? 'rotate-180' : ''}`} />}
-              </a>
+              </Link>
 
               {link.dropdown && (
                 <AnimatePresence>

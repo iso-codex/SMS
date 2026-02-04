@@ -121,6 +121,21 @@ const AddTeacherModal = ({ isOpen, onClose, onSuccess, editTeacher = null }) => 
         setLoading(true);
 
         try {
+            // Check if email already exists
+            if (!editTeacher) {
+                const { data: existingUser, error: checkError } = await supabase
+                    .from('users')
+                    .select('id')
+                    .eq('email', formData.email)
+                    .maybeSingle();
+
+                if (existingUser) {
+                    setErrors(prev => ({ ...prev, email: 'This email is already registered.' }));
+                    setLoading(false);
+                    return;
+                }
+            }
+
             if (editTeacher) {
                 // Update existing teacher
                 const { error } = await supabase
@@ -149,7 +164,6 @@ const AddTeacherModal = ({ isOpen, onClose, onSuccess, editTeacher = null }) => 
                 onSuccess('Teacher updated successfully!');
             } else {
                 // Create new teacher using RPC function
-                // First create the auth user with the role
                 const { data: userId, error: createError } = await supabase
                     .rpc('create_user_with_role', {
                         email: formData.email,
@@ -161,22 +175,24 @@ const AddTeacherModal = ({ isOpen, onClose, onSuccess, editTeacher = null }) => 
                 if (createError) throw createError;
 
                 // Then update with additional teacher-specific fields
-                const { error: updateError } = await supabase
-                    .from('users')
-                    .update({
-                        phone: formData.phone,
-                        address: formData.address,
-                        date_of_birth: formData.date_of_birth || null,
-                        subject_id: formData.subject_id || null,
-                        qualification: formData.qualification,
-                        experience_years: formData.experience_years ? parseInt(formData.experience_years) : null,
-                        joining_date: formData.joining_date || new Date().toISOString().split('T')[0],
-                        gender: formData.gender,
-                        teacher_code: formData.teacher_code
-                    })
-                    .eq('id', userId);
+                if (userId) {
+                    const { error: updateError } = await supabase
+                        .from('users')
+                        .update({
+                            phone: formData.phone,
+                            address: formData.address,
+                            date_of_birth: formData.date_of_birth || null,
+                            subject_id: formData.subject_id || null,
+                            qualification: formData.qualification,
+                            experience_years: formData.experience_years ? parseInt(formData.experience_years) : null,
+                            joining_date: formData.joining_date || new Date().toISOString().split('T')[0],
+                            gender: formData.gender,
+                            teacher_code: formData.teacher_code
+                        })
+                        .eq('id', userId);
 
-                if (updateError) throw updateError;
+                    if (updateError) throw updateError;
+                }
 
                 // Close modal and reset form first
                 resetForm();
@@ -187,7 +203,11 @@ const AddTeacherModal = ({ isOpen, onClose, onSuccess, editTeacher = null }) => 
             }
         } catch (error) {
             console.error('Error saving teacher:', error);
-            setErrors({ submit: error.message || 'Failed to save teacher. Please try again.' });
+            if (error.message?.includes('duplicate key') || error.message?.includes('users_email_partial_key')) {
+                setErrors({ email: 'This email is already associated with an account.' });
+            } else {
+                setErrors({ submit: error.message || 'Failed to save teacher. Please try again.' });
+            }
         } finally {
             setLoading(false);
         }

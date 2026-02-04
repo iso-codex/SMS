@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard, LogOut, LucideSchool, ClipboardList, Settings,
-    Menu, X, GraduationCap, ChevronLeft, UserCircle
+    Menu, X, GraduationCap, ChevronLeft, UserCircle, Calendar, FileText, BookOpen, Mail, Book, AlertTriangle, Activity
 } from 'lucide-react';
 import useAuthStore from '../../lib/authStore';
 import { supabase } from '../../lib/supabase';
@@ -41,7 +41,14 @@ const TeacherLayout = () => {
     const navItems = [
         { path: '/teacher/dashboard', label: 'Dashboard', icon: LayoutDashboard },
         { path: '/teacher/classes', label: 'My Classes', icon: LucideSchool },
-        { path: '/teacher/exams', label: 'Exams', icon: ClipboardList },
+        { path: '/teacher/assignments', label: 'Assignments', icon: FileText },
+        { path: '/teacher/gradebook', label: 'Gradebook', icon: BookOpen },
+        { path: '/teacher/messages', label: 'Messages', icon: Mail },
+        { path: '/teacher/assessments', label: 'Assessments', icon: ClipboardList },
+        { path: '/teacher/lessons', label: 'Lesson Plans', icon: Book },
+        { path: '/teacher/behavior', label: 'Behavior', icon: AlertTriangle },
+        { path: '/teacher/reports', label: 'Reports', icon: Activity },
+        { path: '/teacher/attendance', label: 'Attendance', icon: Calendar },
         { path: '/teacher/settings', label: 'Settings', icon: Settings },
     ];
 

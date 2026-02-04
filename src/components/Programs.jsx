@@ -1,63 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { BookOpen, GraduationCap, Rocket, Target, Globe, Award, ArrowRight } from 'lucide-react';
-
-const programs = [
-    {
-        title: "Cambridge Checkpoint Preparation",
-        description: "Primary and Secondary checkpoint examination tutors preparation.",
-        icon: GraduationCap,
-        color: "emerald",
-        tags: ["Mathematics", "English", "Science"],
-        students: "1,500+",
-        delay: 0.1
-    },
-    {
-        title: "Cambridge IGCSE Preparation",
-        description: "International GCSE preparation with expert Cambridge tutors.",
-        icon: BookOpen,
-        color: "violet",
-        tags: ["Mathematics", "Sciences", "Languages", "+1 more"],
-        students: "2,200+",
-        delay: 0.2
-    },
-    {
-        title: "11+ Entrance Preparation",
-        description: "UK Grammar & Independent school entrance exam preparation.",
-        icon: Target,
-        color: "amber",
-        tags: ["English", "Maths", "Verbal Reasoning", "+1 more"],
-        students: "800+",
-        delay: 0.3
-    },
-    {
-        title: "IELTS Preparation",
-        description: "Academic and General Training IELTS preparation.",
-        icon: Globe,
-        color: "cyan",
-        tags: ["Listening", "Reading", "Writing", "+1 more"],
-        students: "1,800+",
-        delay: 0.4
-    },
-    {
-        title: "SAT Preparation",
-        description: "US college admissions standardized test preparation.",
-        icon: Rocket,
-        color: "rose",
-        tags: ["Reading", "Writing", "Mathematics"],
-        students: "600+",
-        delay: 0.5
-    },
-    {
-        title: "A-Level Support",
-        description: "In-depth advanced level tutoring across STEM and Humanities for university preparation.",
-        icon: Award,
-        color: "blue",
-        tags: ["Cognitive Abilities", "Achievement Tests", "Critical Thinking"],
-        students: "400+",
-        delay: 0.6
-    }
-];
+import { ArrowRight } from 'lucide-react';
+import { programs } from '../data/programsData';
 
 const Programs = () => {
     // Helper for colors

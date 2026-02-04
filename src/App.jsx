@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './components/Home';
+import ProgramsPage from './components/ProgramsPage';
 import Login from './components/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminLayout from './components/admin/Layout';
@@ -15,7 +16,7 @@ import Account from './components/admin/Account';
 import Class from './components/admin/Class';
 import Subject from './components/admin/Subject';
 import Routine from './components/admin/Routine';
-import Attendance from './components/admin/Attendance';
+// import Attendance from './components/admin/Attendance'; // Removed from admin
 import Exam from './components/admin/Exam';
 import Notice from './components/admin/Notice';
 import Transport from './components/admin/Transport';
@@ -32,6 +33,17 @@ import TeacherLayout from './components/teacher/Layout';
 import TeacherDashboard from './components/teacher/Dashboard';
 import TeacherClasses from './components/teacher/Classes';
 import TeacherExams from './components/teacher/Exams';
+import TeacherAttendance from './components/teacher/Attendance'; // Added for teacher
+import TeacherAssignments from './components/teacher/Assignments';
+import TeacherClassDetails from './components/teacher/ClassDetails';
+import TeacherGradebook from './components/teacher/Gradebook';
+import TeacherMessages from './components/teacher/Messages';
+import TeacherAssessments from './components/teacher/Assessments';
+import QuizBuilder from './components/teacher/QuizBuilder';
+import TeacherLessons from './components/teacher/Lessons';
+import LessonPlanner from './components/teacher/LessonPlanner';
+import TeacherBehavior from './components/teacher/Behavior';
+import TeacherReports from './components/teacher/Reports';
 import TeacherSettings from './components/teacher/Settings';
 import AccountantLayout from './components/accountant/Layout';
 import AccountantDashboard from './components/accountant/Dashboard';
@@ -81,6 +93,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/programs" element={<ProgramsPage />} />
         <Route path="/login" element={<Login />} />
 
         {/* Admin Routes */}
@@ -96,7 +109,7 @@ function App() {
             <Route path="class" element={<Class />} />
             <Route path="subject" element={<Subject />} />
             <Route path="routine" element={<Routine />} />
-            <Route path="attendance" element={<Attendance />} />
+            {/* <Route path="attendance" element={<Attendance />} /> */}
             <Route path="exam" element={<Exam />} />
             <Route path="notice" element={<Notice />} />
             <Route path="transport" element={<Transport />} />
@@ -123,6 +136,19 @@ function App() {
           <Route path="/teacher" element={<TeacherLayout />}>
             <Route path="dashboard" element={<TeacherDashboard />} />
             <Route path="classes" element={<TeacherClasses />} />
+            <Route path="classes/:classId" element={<TeacherClassDetails />} />
+            <Route path="assignments" element={<TeacherAssignments />} />
+            <Route path="gradebook" element={<TeacherGradebook />} />
+            <Route path="messages" element={<TeacherMessages />} />
+            <Route path="assessments" element={<TeacherAssessments />} />
+            <Route path="assessments/create" element={<QuizBuilder />} />
+            <Route path="assessments/edit/:quizId" element={<QuizBuilder />} />
+            <Route path="lessons" element={<TeacherLessons />} />
+            <Route path="lessons/create" element={<LessonPlanner />} />
+            <Route path="lessons/edit/:lessonId" element={<LessonPlanner />} />
+            <Route path="behavior" element={<TeacherBehavior />} />
+            <Route path="reports" element={<TeacherReports />} />
+            <Route path="attendance" element={<TeacherAttendance />} />
             <Route path="exams" element={<TeacherExams />} />
             <Route path="settings" element={<TeacherSettings />} />
           </Route>

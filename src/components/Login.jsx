@@ -359,13 +359,24 @@ const Login = () => {
                                     )}
                                 </button>
                                 {studentStep !== 'identify' && (
-                                    <button
-                                        type="button"
-                                        onClick={() => setStudentStep('identify')}
-                                        className="w-full text-sm text-slate-500 font-bold hover:text-purple-600"
-                                    >
-                                        Back to Verification
-                                    </button>
+                                    <div className="flex flex-col gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => setStudentStep('identify')}
+                                            className="w-full text-sm text-slate-500 font-bold hover:text-purple-600 transition-colors"
+                                        >
+                                            Back to Verification
+                                        </button>
+                                        {studentStep === 'otp' && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setStudentStep('password')} // Allow manual override to password
+                                                className="w-full text-sm text-purple-600 font-bold hover:text-purple-700 transition-colors"
+                                            >
+                                                Already have a password? Login here
+                                            </button>
+                                        )}
+                                    </div>
                                 )}
                             </form>
                         )}
